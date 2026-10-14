@@ -1,0 +1,10 @@
+find_package(
+  mujoco @FIBRIL_MUJOCO_VERSION@ CONFIG REQUIRED
+  PATHS "${fibril_mujoco_vendor_DIR}/../../../opt/fibril_mujoco_vendor/lib/cmake/mujoco"
+  NO_DEFAULT_PATH
+)
+
+# ament_export_dependencies(fibril_mujoco_vendor) した先 (fibril_sim_mujoco に依存する
+# fibril_sim_trace のテストなど) が libmujoco をリンクできるように target を渡す.
+# これが無いと isolated install では実行ファイルのリンクで libmujoco が見つからない.
+list(APPEND fibril_mujoco_vendor_TARGETS mujoco::mujoco)
