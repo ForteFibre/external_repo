@@ -1,0 +1,13 @@
+list(
+  PREPEND CMAKE_PREFIX_PATH
+  "${iceoryx2_vendor_DIR}/../../../opt/iceoryx2_vendor"
+)
+find_package(
+  iceoryx2-cxx @FIBRIL_ICEORYX2_VERSION@ CONFIG REQUIRED
+  PATHS "${iceoryx2_vendor_DIR}/../../../opt/iceoryx2_vendor/lib/cmake/iceoryx2-cxx"
+  NO_DEFAULT_PATH
+)
+
+# ament_export_dependencies(iceoryx2_vendor) した先 (fibril_sim_runtime に依存する
+# パッケージなど) が libiceoryx2_cxx をリンクできるように target を渡す.
+list(APPEND iceoryx2_vendor_TARGETS iceoryx2-cxx::shared-lib-cxx)
