@@ -60,3 +60,5 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_KEY }}
           gpg_fingerprint: 6FD24526DB354C619705230B69ACCD996E5940A7
           platform: ${{ matrix.platform }}
+          # jazzy は noble、lyrical は resolute に出す。lyrical が落ちても noble の deb は出る
+          rosdistros: jazzy lyrical
