@@ -12,12 +12,17 @@ on:
 jobs:
   build:
     strategy:
+      # jazzy と lyrical を別のジョブにし、片方が落ちても他方の deb は出す
+      fail-fast: false
       matrix:
+        rosdistro: [jazzy, lyrical]
+        platform: [arm64, amd64]
         include:
-          - runs-on: ubuntu-24.04-arm
-            platform: arm64
-          - runs-on: ubuntu-24.04
-            platform: amd64
+          - platform: arm64
+            runs-on: ubuntu-24.04-arm
+          - platform: amd64
+            runs-on: ubuntu-24.04
+    name: build (${{ matrix.rosdistro }}, ${{ matrix.platform }})
     runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/create-github-app-token@v2
@@ -47,7 +52,17 @@ jobs:
           mkdir -p external
           vcs import external < dependency.repos
           vcs pull external
-        
+
+      # lyrical でビルドできないパッケージを外す（colcon と rosdep は COLCON_IGNORE のあるディレクトリを見ない）
+      # - behaviortree_ros2、btcpp_ros2_samples：ament_target_dependencies が lyrical で無くなった
+      # - jsk_visualization：jsk_rviz_plugins が Qt5 のままで、jsk_rqt_plugins と jsk_visualization がそれに依存する
+      - name: Exclude packages unsupported on lyrical
+        if: matrix.rosdistro == 'lyrical'
+        run: |
+          touch external/behaviortree_ros2/behaviortree_ros2/COLCON_IGNORE
+          touch external/behaviortree_ros2/btcpp_ros2_samples/COLCON_IGNORE
+          touch external/jsk_visualization/COLCON_IGNORE
+
       - name: Build packages
         uses: ForteFibre/fortefibre_github_action/create_debian_packages_batch@main
         with:
@@ -60,5 +75,5 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_KEY }}
           gpg_fingerprint: 6FD24526DB354C619705230B69ACCD996E5940A7
           platform: ${{ matrix.platform }}
-          # jazzy は noble、lyrical は resolute に出す。lyrical が落ちても noble の deb は出る
-          rosdistros: jazzy lyrical
+          # jazzy は noble、lyrical は resolute に出す
+          rosdistros: ${{ matrix.rosdistro }}

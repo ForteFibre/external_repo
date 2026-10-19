@@ -19,10 +19,11 @@ repositories:
     type: git
     url: https://github.com/ForteFibre/casadi_vendor.git
     version: master
+  # upstream の main に lyrical の修正（ament_target_dependencies の置き換え）だけを足したブランチ
   ros_odrive:
     type: git
-    url: https://github.com/odriverobotics/ros_odrive.git
-    version: main
+    url: https://github.com/ForteFibre/ros_odrive.git
+    version: fix/2026-10-18-lyrical-sources
   efsw_vendor:
     type: git
     url: https://github.com/ForteFibre/efsw_vendor.git
